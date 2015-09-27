@@ -27,8 +27,7 @@
 ;; Test whether NAME match PATTERN.
 ;; Matching ignores case if `case-fold-search' is non-nil.
 
-;; PATTERN should be a zsh-like glob string.
-;; Special characters for wildcard matching are:
+;; Zsh-like wildcard matching can be used in PATTERN:
 
 ;; *           Matches any string of characters, except path separators (/)
 ;; **          Matches any string of characters
@@ -79,8 +78,7 @@
 
 Matching ignores case if `case-fold-search' is non-nil.
 
-PATTERN should be a zsh-like glob string.
-Special characters for wildcard matching are:
+Zsh-like wildcard matching can be used in PATTERN:
 
 *           Matches any string of characters, except path separators (/)
 **          Matches any string of characters
