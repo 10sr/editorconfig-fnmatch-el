@@ -1,6 +1,52 @@
-(require 'cl-macs)
+;;; fnmatch.el --- A Zsh-Like Glob Library
 
-(defvar fnmatch--cache-alist
+;; Author: 10sr <8slashes+el [at] gmail [dot] com>
+;; URL: https://github.com/10sr/fnmatch-el
+;; Version: 0.0.1
+;; Keywords: utility shell fnmatch glob wildcard
+
+;; This file is not part of GNU Emacs.
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; fnmatch-p (name pattern)
+
+;; Test whether NAME match PATTERN.
+;; Matching ignores case if `case-fold-search' is non-nil.
+
+;; PATTERN should be a zsh-like glob string.
+;; Special characters for wildcard matching are:
+
+;; *           Matches any string of characters, except path separators (/)
+;; **          Matches any string of characters
+;; ?           Matches any single character
+;; [name]      Matches any single character in name
+;; [^name]     Matches any single character not in name
+;; {s1,s2,s3}  Matches any of the strings given (separated by commas)
+;; {min..max}  Matches any number between min and max
+
+
+;; This library is a port from editorconfig-core-py library.
+;; https://github.com/editorconfig/editorconfig-core-py/blob/master/editorconfig/fnmatch.py
+
+;;; Code:
+
+(require 'cl-lib)
+
+(defvar fnmatch--cache-hash
   ()
   "Cache of shell pattern and its translation.")
 
@@ -16,7 +62,7 @@
 
 (defconst fnmatch--numeric-range-regexp
   "\\([+-]?[0-9]+\\)\\.\\.\\([+-]?[0-9]+\\)"
-  "Regular expression for numaric range (like {-3..+3})")
+  "Regular expression for numaric range (like {-3..+3}).")
 
 (defun fnmatch--match-num (regexp string)
   "Return how many times REGEXP is found in STRING."
@@ -27,16 +73,22 @@
             string (substring string (match-end 0))))
     num))
 
+;;;###autoload
 (defun fnmatch-p (name pattern)
-  "Test whether FILENAME matches PATTERN."
-  (fnmatch-fnmatchcase-p name pattern))
+  "Test whether NAME match PATTERN.
 
-;;(editorconfig-core-fnmatch-p "4.js" "{-3..3}.js")
-;;(setq debug-on-error t)
+Matching ignores case if `case-fold-search' is non-nil.
 
+PATTERN should be a zsh-like glob string.
+Special characters for wildcard matching are:
 
-(defun fnmatch-fnmatchcase-p (name pattern)
-  "Test whether NAME matches PATTERN, including case."
+*           Matches any string of characters, except path separators (/)
+**          Matches any string of characters
+?           Matches any single character
+[name]      Matches any single character in name
+[^name]     Matches any single character not in name
+{s1,s2,s3}  Matches any of the strings given (separated by commas)
+{min..max}  Matches any number between min and max"
   (let* ((translated (fnmatch-translate pattern))
          (re (car translated))
          (num-groups (nth 1 translated))
@@ -60,10 +112,10 @@
               (setq pattern-matched nil)))))
       pattern-matched)))
 
-
-
 (defun fnmatch-translate (pattern &optional nested)
-  "Translate a shell PATTERN to a regular expression."
+  "Translate a shell PATTERN to a regular expression.
+
+Set NESTED to t when this function is called from itself."
   (let ((index 0)
         (length (length pattern))
         (brace-level 0)
@@ -217,4 +269,5 @@
           numeric-groups)))
 
 (provide 'fnmatch)
-;;; fnmatch ends here
+
+;;; fnmatch.el ends here
