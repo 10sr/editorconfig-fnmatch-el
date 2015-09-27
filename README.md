@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/10sr/fnmatch-el.svg)](https://travis-ci.org/10sr/fnmatch-el)
+
+
 fnmatch-el
 ==========
 
