@@ -4,11 +4,11 @@ ert_tests_el = $(wildcard tests/*.el)
 el = $(wildcard *.el)
 elc = $(el:%.el=%.elc)
 
-.PHONY: all test test-ert build
+.PHONY: all test build test-ert info test-install
 
 all:
 
-test: build test-ert info
+test: build test-ert info test-install
 
 build: $(elc)
 
@@ -21,6 +21,8 @@ test-ert: $(ert_tests_el)
 		-f ert-run-tests-batch-and-exit
 
 
+###############################
+# info
 elisp_get_file_package_info := \
 	(lambda (f) \
 		(with-temp-buffer \
@@ -38,4 +40,22 @@ info: $(el)
 	$(emacs) -batch -Q \
 		--eval "(require 'package)" \
 		--eval "$(elisp_print_infos)" \
+		$^
+
+
+##################################
+# test-install
+
+elisp_install_files := \
+	(mapc \
+		(lambda (f) \
+			(message \"Install file: %s\" f) \
+			(package-install-file f)) \
+		command-line-args-left)
+
+
+test-install: $(el)
+	$(emacs) -batch -Q \
+		--eval '(setq package-user-dir "$(PWD)/test-install")' \
+		--eval "$(elisp_install_files)" \
 		$^
