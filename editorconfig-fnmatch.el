@@ -51,7 +51,7 @@
 (require 'cl-lib)
 
 (defvar editorconfig-fnmatch--cache-hash
-  ()
+  (make-hash-table :test 'equal)
   "Cache of shell pattern and its translation.")
 
 
@@ -116,10 +116,26 @@ be used:
               (setq pattern-matched nil)))))
       pattern-matched)))
 
-(defun editorconfig-fnmatch-translate (pattern &optional nested)
+(defun editorconfig-fnmatch-translate (pattern)
   "Translate a shell PATTERN to a regular expression.
 
-Set NESTED to t when this function is called from itself."
+Translation result will be cached, so same translation will not be done twice."
+  (let ((cached (gethash pattern
+                         editorconfig-fnmatch--cache-hash)))
+    (or cached
+        (let ((result (editorconfig-fnmatch--do-translate pattern)))
+          (puthash pattern
+                   result
+                   editorconfig-fnmatch--cache-hash)))))
+
+
+(defun editorconfig-fnmatch--do-translate (pattern &optional nested)
+  "Translate a shell PATTERN to a regular expression.
+
+Set NESTED to t when this function is called from itself.
+
+This function is called from `editorconfig-fnmatch-translate', when no cached
+translation is found for PATTERN."
   (let ((index 0)
         (length (length pattern))
         (brace-level 0)
@@ -220,7 +236,7 @@ Set NESTED to t when this function is called from itself."
                                                                           (match-string 2
                                                                                         pattern-sub))))
                          result `(,@result "\\([+-]?[0-9]+\\)"))
-                 (let ((inner (editorconfig-fnmatch-translate pattern-sub t)))
+                 (let ((inner (editorconfig-fnmatch--do-translate pattern-sub t)))
                    (setq result `(,@result ,(format "\\{%s\\}"
                                                     (car inner)))
                          numeric-groups `(,@numeric-groups ,(nth 1 inner)))))
