@@ -1,4 +1,4 @@
-;;; editorconfig-fnmatch.el --- fnmatch Implementation in Emacs Lisp
+;;; editorconfig-fnmatch.el --- Glob pattern matching in Emacs lisp
 
 ;; Author: 10sr <8slashes+el [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/editorconfig-fnmatch-el
@@ -24,15 +24,15 @@
 
 ;; editorconfig-fnmatch.el provides a fnmatch implementation with a few
 ;; extensions.
-;; The main usage of this library is matching files for EditorConfig, but it can
-;; also act solely.
+;; The main usage of this library is glob pattern matching for EditorConfig, but
+;; it can also act solely.
 
 ;; editorconfig-fnmatch-p (name pattern)
 
 ;; Test whether NAME match PATTERN.
-;; Matching ignores case if `case-fold-search' is non-nil.
 
-;; Zsh-like wildcard matching can be used in PATTERN:
+;; PATTERN should be a shell glob pattern, and some zsh-like wildcard matchings
+;; can be used:
 
 ;; *           Matches any string of characters, except path separators (/)
 ;; **          Matches any string of characters
@@ -83,7 +83,8 @@
 
 Matching ignores case if `case-fold-search' is non-nil.
 
-Zsh-like wildcard matching can be used in PATTERN:
+PATTERN should be a shell glob pattern, and some zsh-like wildcard matchings can
+be used:
 
 *           Matches any string of characters, except path separators (/)
 **          Matches any string of characters

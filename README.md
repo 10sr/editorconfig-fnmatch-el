@@ -7,22 +7,26 @@ editorconfig-fnmatch-el
 
 editorconfig-fnmatch.el provides a fnmatch implementation with a few
 extensions.
-The main usage of this library is matching files for EditorConfig, but it can
-also act solely.
+The main usage of this library is glob pattern matching for EditorConfig, but it
+can also act solely.
 
 
 
 Usage
 ------
 
+Eval
+
     (editorconfig-fnmatch-p NAME PATTERN)
 
-To test if NAME match PATTERN.
+to test if NAME match PATTERN, e.g.
 
+    (editorconfig-fnmatch-p "a.js" "*.js")       ; => t
+    (editorconfig-fnmatch-p "/dir/a.js" "**.js") ; => t
+    (editorconfig-fnmatch-p "d.js" "[abc].js")   ; => nil
 
-
-Zsh-like wildcard matching can be used in PATTERN:
-
+PATTERN should be a shell glob pattern, and some zsh-like wildcard matchings can
+be used:
 
 |chars        |desc
 |-------------|-------------------------------------------------------------
@@ -45,6 +49,6 @@ See `LICENSE` for details.
 Aknowledgement
 --------------
 
-This library is a port from 
+This library is a port from
 [editorconfig-core-py] (https://github.com/editorconfig/editorconfig-core-py/blob/master/editorconfig/fnmatch.py)
 library.
