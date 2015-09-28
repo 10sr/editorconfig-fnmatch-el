@@ -1,7 +1,7 @@
-;;; fnmatch.el --- A Zsh-Like Glob Library
+;;; editorconfig-fnmatch.el --- fnmatch Implementation in Emacs Lisp
 
 ;; Author: 10sr <8slashes+el [at] gmail [dot] com>
-;; URL: https://github.com/10sr/fnmatch-el
+;; URL: https://github.com/10sr/editorconfig-fnmatch-el
 ;; Version: 0.0.1
 ;; Keywords: utility shell fnmatch glob wildcard
 
@@ -22,7 +22,12 @@
 
 ;;; Commentary:
 
-;; fnmatch-p (name pattern)
+;; editorconfig-fnmatch.el provides a fnmatch implementation with a few
+;; extensions.
+;; The main usage of this library is matching files for EditorConfig, but it can
+;; also act solely.
+
+;; editorconfig-fnmatch-p (name pattern)
 
 ;; Test whether NAME match PATTERN.
 ;; Matching ignores case if `case-fold-search' is non-nil.
@@ -45,25 +50,25 @@
 
 (require 'cl-lib)
 
-(defvar fnmatch--cache-hash
+(defvar editorconfig-fnmatch--cache-hash
   ()
   "Cache of shell pattern and its translation.")
 
 
-(defconst fnmatch--left-brace-regexp
+(defconst editorconfig-fnmatch--left-brace-regexp
   "\\(^\\|[^\\]\\){"
   "Regular expression for left brace ({).")
 
-(defconst fnmatch--right-brace-regexp
+(defconst editorconfig-fnmatch--right-brace-regexp
   "\\(^\\|[^\\]\\)}"
   "Regular expression for right brace (}).")
 
 
-(defconst fnmatch--numeric-range-regexp
+(defconst editorconfig-fnmatch--numeric-range-regexp
   "\\([+-]?[0-9]+\\)\\.\\.\\([+-]?[0-9]+\\)"
   "Regular expression for numaric range (like {-3..+3}).")
 
-(defun fnmatch--match-num (regexp string)
+(defun editorconfig-fnmatch--match-num (regexp string)
   "Return how many times REGEXP is found in STRING."
   (let ((num 0))
     ;; START arg does not work as expected in this case
@@ -73,7 +78,7 @@
     num))
 
 ;;;###autoload
-(defun fnmatch-p (name pattern)
+(defun editorconfig-fnmatch-p (name pattern)
   "Test whether NAME match PATTERN.
 
 Matching ignores case if `case-fold-search' is non-nil.
@@ -87,7 +92,7 @@ Zsh-like wildcard matching can be used in PATTERN:
 [^name]     Matches any single character not in name
 {s1,s2,s3}  Matches any of the strings given (separated by commas)
 {min..max}  Matches any number between min and max"
-  (let* ((translated (fnmatch-translate pattern))
+  (let* ((translated (editorconfig-fnmatch-translate pattern))
          (re (car translated))
          (num-groups (nth 1 translated))
          (match (string-match re name))
@@ -110,7 +115,7 @@ Zsh-like wildcard matching can be used in PATTERN:
               (setq pattern-matched nil)))))
       pattern-matched)))
 
-(defun fnmatch-translate (pattern &optional nested)
+(defun editorconfig-fnmatch-translate (pattern &optional nested)
   "Translate a shell PATTERN to a regular expression.
 
 Set NESTED to t when this function is called from itself."
@@ -121,11 +126,11 @@ Set NESTED to t when this function is called from itself."
         ;; List of strings of resulting regexp
         (result ())
         (is-escaped nil)
-        (matching-braces (= (fnmatch--match-num
-                             fnmatch--left-brace-regexp
+        (matching-braces (= (editorconfig-fnmatch--match-num
+                             editorconfig-fnmatch--left-brace-regexp
                              pattern)
-                            (fnmatch--match-num
-                             fnmatch--right-brace-regexp
+                            (editorconfig-fnmatch--match-num
+                             editorconfig-fnmatch--right-brace-regexp
                              pattern)))
         (numeric-groups ())
 
@@ -205,7 +210,7 @@ Set NESTED to t when this function is called from itself."
          (if (and (not has-comma)
                   (< pos length))
              (let ((pattern-sub (substring pattern index pos)))
-               (setq num-range (string-match fnmatch--numeric-range-regexp
+               (setq num-range (string-match editorconfig-fnmatch--numeric-range-regexp
                                              pattern-sub))
                (if num-range
                    (setq numeric-groups `(,@numeric-groups ,(mapcar 'string-to-number
@@ -214,7 +219,7 @@ Set NESTED to t when this function is called from itself."
                                                                           (match-string 2
                                                                                         pattern-sub))))
                          result `(,@result "\\([+-]?[0-9]+\\)"))
-                 (let ((inner (fnmatch-translate pattern-sub t)))
+                 (let ((inner (editorconfig-fnmatch-translate pattern-sub t)))
                    (setq result `(,@result ,(format "\\{%s\\}"
                                                     (car inner)))
                          numeric-groups `(,@numeric-groups ,(nth 1 inner)))))
@@ -266,6 +271,6 @@ Set NESTED to t when this function is called from itself."
                      "")
           numeric-groups)))
 
-(provide 'fnmatch)
+(provide 'editorconfig-fnmatch)
 
-;;; fnmatch.el ends here
+;;; editorconfig-fnmatch.el ends here

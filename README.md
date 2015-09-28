@@ -1,18 +1,21 @@
-[![Build Status](https://travis-ci.org/10sr/fnmatch-el.svg)](https://travis-ci.org/10sr/fnmatch-el)
+[![Build Status](https://travis-ci.org/10sr/editorconfig-fnmatch-el.svg)](https://travis-ci.org/10sr/editorconfig-fnmatch-el)
 
 
-fnmatch-el
+editorconfig-fnmatch-el
 ==========
 
 
-A zsh-like glob library for Emacs
+editorconfig-fnmatch.el provides a fnmatch implementation with a few
+extensions.
+The main usage of this library is matching files for EditorConfig, but it can
+also act solely.
 
 
 
 Usage
 ------
 
-    (fnmatch-p NAME PATTERN)
+    (editorconfig-fnmatch-p NAME PATTERN)
 
 To test if NAME match PATTERN.
 

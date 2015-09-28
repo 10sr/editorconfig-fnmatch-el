@@ -1,7 +1,7 @@
-(require 'fnmatch)
+(require 'editorconfig-fnmatch)
 
 
-(ert-deftest test-fnmatch-p ()
+(ert-deftest test-editorconfig-fnmatch-p ()
   (let ((cases-t
          '(("a.js" "a.js")
            ("/dir/a.js" "/dir/a.js")
@@ -79,12 +79,12 @@
            )))
     (dolist (args cases-t)
       (message "-> t: %S"
-               `(fnmatch-p ,@args))
-      (should (apply 'fnmatch-p
+               `(editorconfig-fnmatch-p ,@args))
+      (should (apply 'editorconfig-fnmatch-p
                      args)))
     (dolist (args cases-nil)
       (message "-> nil: %S"
-               `(fnmatch-p ,@args))
-      (should-not (apply 'fnmatch-p
+               `(editorconfig-fnmatch-p ,@args))
+      (should-not (apply 'editorconfig-fnmatch-p
                          args))))
   )
