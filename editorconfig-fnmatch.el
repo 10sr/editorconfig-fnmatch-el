@@ -123,10 +123,9 @@ Translation result will be cached, so same translation will not be done twice."
   (let ((cached (gethash pattern
                          editorconfig-fnmatch--cache-hash)))
     (or cached
-        (let ((result (editorconfig-fnmatch--do-translate pattern)))
-          (puthash pattern
-                   result
-                   editorconfig-fnmatch--cache-hash)))))
+        (puthash pattern
+                 (editorconfig-fnmatch--do-translate pattern)
+                 editorconfig-fnmatch--cache-hash))))
 
 
 (defun editorconfig-fnmatch--do-translate (pattern &optional nested)
