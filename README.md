@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/10sr/editorconfig-fnmatch-el.svg)](https://travis-ci.org/10sr/editorconfig-fnmatch-el)
 [![MELPA](http://melpa.org/packages/editorconfig-fnmatch-badge.svg)](http://melpa.org/#/editorconfig-fnmatch)
+[![MELPA Stable](http://stable.melpa.org/packages/editorconfig-fnmatch-badge.svg)](http://stable.melpa.org/#/editorconfig-fnmatch)
 
 
 editorconfig-fnmatch-el
