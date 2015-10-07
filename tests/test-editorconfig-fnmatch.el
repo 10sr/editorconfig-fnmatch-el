@@ -9,6 +9,7 @@
            ("a.js" "*.js")
            ("a.js" "**.js")
            ("/dir/a.js" "/dir/*.js")
+           ("/dir/a.js" "/dir/*")
 
            ("/dir/sub/a.js" "**.js")
            ("/dir/sub/a.py" "/dir/**.py")

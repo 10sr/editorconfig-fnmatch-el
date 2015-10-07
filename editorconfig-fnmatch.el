@@ -263,8 +263,10 @@ translation is found for PATTERN."
            (setq result `(,@result "\\}"))))
 
         (?/
-         (if (string= (substring pattern index (+ index 3))
-                      "**/")
+         (if (and (<= (+ index 3)
+                      (length pattern))
+                  (string= (substring pattern index (+ index 3))
+                           "**/"))
              (setq result `(,@result "\\(/\\|/.*/\\)")
                    numeric-groups `(,@numeric-groups ignore)
                    index (+ index 3))
