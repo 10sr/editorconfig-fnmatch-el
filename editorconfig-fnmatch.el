@@ -247,7 +247,7 @@ translation is found for PATTERN."
                (setq result `(,@result "\\(")
                      numeric-groups `(,@numeric-groups ignore)
                      brace-level (1+ brace-level))
-             (setq result `(,@result "\\{")))))
+             (setq result `(,@result "{")))))
 
         (?,
          (if (and (> brace-level 0)
@@ -260,7 +260,7 @@ translation is found for PATTERN."
                   (not is-escaped))
              (setq result `(,@result "\\)")
                    brace-level (- brace-level 1))
-           (setq result `(,@result "\\}"))))
+           (setq result `(,@result "}"))))
 
         (?/
          (if (and (<= (+ index 3)

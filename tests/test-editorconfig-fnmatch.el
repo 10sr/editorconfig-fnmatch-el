@@ -41,6 +41,8 @@
            ("/dir/sub/a.py" "**.{py,js}")
            ("/dir/sub/a.py" "/dir/**.{py,js}")
            ("{single}.b" "{single}.b")
+           ("{.f" "{.f")
+           ("}.f" "}.f")
 
            ("1.js" "{0..3}.js")
            ("1.js" "{0..+3}.js")
