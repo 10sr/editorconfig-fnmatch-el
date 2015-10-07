@@ -236,9 +236,9 @@ translation is found for PATTERN."
                                                                                         pattern-sub))))
                          result `(,@result "\\([+-]?[0-9]+\\)"))
                  (let ((inner (editorconfig-fnmatch--do-translate pattern-sub t)))
-                   (setq result `(,@result ,(format "\\{%s\\}"
+                   (setq result `(,@result ,(format "{%s}"
                                                     (car inner)))
-                         numeric-groups `(,@numeric-groups ,(nth 1 inner)))))
+                         numeric-groups `(,@numeric-groups ,@(nth 1 inner)))))
                (setq index (1+ pos)))
            (if matching-braces
                ;; "(?:" is a python re feature of non-captureing regular parens
