@@ -22,6 +22,7 @@
            ("b.js" "[abc].js")
            ("ab.js" "[abc]b.js")
            ("/dir/a.js" "/dir/[abc].js")
+           ("ab[e/]cd.i" "ab[e/]cd.i")
            ("a.js" "[a-c].js")
            ("1.js" "[1-3].js")
 
