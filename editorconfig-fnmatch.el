@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8slashes+el [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/editorconfig-fnmatch-el
-;; Version: 0.1.0
+;; Version: 0.1.1
 ;; Keywords: utility shell fnmatch glob wildcard
 
 ;; This file is not part of GNU Emacs.
@@ -236,9 +236,9 @@ translation is found for PATTERN."
                                                                                         pattern-sub))))
                          result `(,@result "\\([+-]?[0-9]+\\)"))
                  (let ((inner (editorconfig-fnmatch--do-translate pattern-sub t)))
-                   (setq result `(,@result ,(format "\\{%s\\}"
+                   (setq result `(,@result ,(format "{%s}"
                                                     (car inner)))
-                         numeric-groups `(,@numeric-groups ,(nth 1 inner)))))
+                         numeric-groups `(,@numeric-groups ,@(nth 1 inner)))))
                (setq index (1+ pos)))
            (if matching-braces
                ;; "(?:" is a python re feature of non-captureing regular parens
@@ -247,7 +247,7 @@ translation is found for PATTERN."
                (setq result `(,@result "\\(")
                      numeric-groups `(,@numeric-groups ignore)
                      brace-level (1+ brace-level))
-             (setq result `(,@result "\\{")))))
+             (setq result `(,@result "{")))))
 
         (?,
          (if (and (> brace-level 0)
@@ -260,11 +260,13 @@ translation is found for PATTERN."
                   (not is-escaped))
              (setq result `(,@result "\\)")
                    brace-level (- brace-level 1))
-           (setq result `(,@result "\\}"))))
+           (setq result `(,@result "}"))))
 
         (?/
-         (if (string= (substring pattern index (+ index 3))
-                      "**/")
+         (if (and (<= (+ index 3)
+                      (length pattern))
+                  (string= (substring pattern index (+ index 3))
+                           "**/"))
              (setq result `(,@result "\\(/\\|/.*/\\)")
                    numeric-groups `(,@numeric-groups ignore)
                    index (+ index 3))
