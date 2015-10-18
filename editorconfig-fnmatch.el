@@ -4,6 +4,8 @@
 ;; URL: https://github.com/10sr/editorconfig-fnmatch-el
 ;; Version: 0.1.1
 ;; Keywords: utility shell fnmatch glob wildcard
+;; Package-Requires: ((cl-lib "0.5"))
+
 
 ;; This file is not part of GNU Emacs.
 
