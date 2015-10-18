@@ -103,18 +103,20 @@ be used:
       (let (num-group matched-num-str matched-num min-num max-num)
         (dotimes (index num-groups-len)
           (setq num-group (nth index num-groups))
-          (unless (eq 'ignore num-group)
-            (setq matched-num-str (match-string (1+ index)
-                                                name)
-                  min-num (car num-group)
-                  max-num (nth 1 num-group))
-            (setq matched-num (string-to-number matched-num-str))
-            (when (or (= (aref matched-num-str 0)
-                         ?0)
-                      (< matched-num min-num)
-                      (< max-num matched-num))
-              (setq pattern-matched nil)))))
+          (setq matched-num-str (match-string (1+ index)
+                                              name)
+                min-num (car num-group)
+                max-num (nth 1 num-group))
+          (setq matched-num (string-to-number matched-num-str))
+          (when (or (= (aref matched-num-str 0)
+                       ?0)
+                    (< matched-num min-num)
+                    (< max-num matched-num))
+            (setq pattern-matched nil))))
       pattern-matched)))
+
+;;(editorconfig-fnmatch-translate "{a,{-3..3}}.js")
+;;(editorconfig-fnmatch-p "1.js" "{a,{-3..3}}.js")
 
 (defun editorconfig-fnmatch-translate (pattern)
   "Translate a shell PATTERN to a regular expression.
@@ -244,8 +246,7 @@ translation is found for PATTERN."
                ;; "(?:" is a python re feature of non-captureing regular parens
                ;; Emacs re does not have this feature. so this should be fixed
                ;; for example by offsetting numeric-groups.
-               (setq result `(,@result "\\(")
-                     numeric-groups `(,@numeric-groups ignore)
+               (setq result `(,@result "\\(?:")
                      brace-level (1+ brace-level))
              (setq result `(,@result "{")))))
 
@@ -267,8 +268,7 @@ translation is found for PATTERN."
                       (length pattern))
                   (string= (substring pattern index (+ index 3))
                            "**/"))
-             (setq result `(,@result "\\(/\\|/.*/\\)")
-                   numeric-groups `(,@numeric-groups ignore)
+             (setq result `(,@result "\\(?:/\\|/.*/\\)")
                    index (+ index 3))
            (setq result `(,@result "/"))))
 
