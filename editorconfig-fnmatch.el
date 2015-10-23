@@ -245,9 +245,6 @@ translation is found for PATTERN."
                          numeric-groups `(,@numeric-groups ,@(nth 1 inner)))))
                (setq index (1+ pos)))
            (if matching-braces
-               ;; "(?:" is a python re feature of non-captureing regular parens
-               ;; Emacs re does not have this feature. so this should be fixed
-               ;; for example by offsetting numeric-groups.
                (setq result `(,@result "\\(?:")
                      brace-level (1+ brace-level))
              (setq result `(,@result "{")))))
