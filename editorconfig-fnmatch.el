@@ -161,126 +161,136 @@ translation is found for PATTERN."
         num-range)
 
     (while (< index length)
-      (setq current-char (aref pattern index)
-            index (1+ index))
+      ;; TODO: More good pattern for 'normal' strings
+      (if (and (not is-escaped)
+               (string-match "[a-zA-Z0-9]+"
+                             pattern
+                             index)
+               (eq index (match-beginning 0)))
+          (setq result `(,@result ,(match-string 0 pattern))
+                index (match-end 0)
+                is-escaped nil)
 
-      (cl-case current-char
-        (?*
-         (setq pos index)
-         (if (and (< pos length)
-                  (= (aref pattern pos) ?*))
-             (setq result `(,@result ".*"))
-           (setq result `(,@result "[^/]*"))))
+        (setq current-char (aref pattern index)
+              index (1+ index))
 
-        (??
-         (setq result `(,@result ".")))
+        (cl-case current-char
+          (?*
+           (setq pos index)
+           (if (and (< pos length)
+                    (= (aref pattern pos) ?*))
+               (setq result `(,@result ".*"))
+             (setq result `(,@result "[^/]*"))))
 
-        (?\[
-         (if in-brackets
-             (setq result `(,@result "\\["))
+          (??
+           (setq result `(,@result ".")))
+
+          (?\[
+           (if in-brackets
+               (setq result `(,@result "\\["))
+             (setq pos index
+                   has-slash nil)
+             (while (and (< pos length)
+                         (not (= (aref pattern pos) ?\]))
+                         (not has-slash))
+               (if (and (= (aref pattern pos) ?/)
+                        (not (= (aref pattern (- pos 1)) ?\\)))
+                   (setq has-slash t)
+                 (setq pos (1+ pos))))
+             (if has-slash
+                 (setq result `(,@result ,(concat "\\["
+                                                  (substring pattern
+                                                             index
+                                                             (1+ pos))
+                                                  "\\]"))
+                       index (+ pos 2))
+               (if (and (< index length)
+                        (memq (aref pattern index)
+                              '(?! ?^)))
+                   (setq index (1+ index)
+                         result `(,@result "[^"))
+                 (setq result `(,@result "[")))
+               (setq in-brackets t))))
+
+          (?-
+           (if in-brackets
+               (setq result `(,@result "-"))
+             (setq result `(,@result "\\-"))))
+
+          (?\]
+           (setq result `(,@result "]")
+                 in-brackets nil))
+
+          (?{
            (setq pos index
-                 has-slash nil)
-           (while (and (< pos length)
-                       (not (= (aref pattern pos) ?\]))
-                       (not has-slash))
-             (if (and (= (aref pattern pos) ?/)
-                      (not (= (aref pattern (- pos 1)) ?\\)))
-                 (setq has-slash t)
-               (setq pos (1+ pos))))
-           (if has-slash
-               (setq result `(,@result ,(concat "\\["
-                                                (substring pattern
-                                                           index
-                                                           (1+ pos))
-                                                "\\]"))
-                     index (+ pos 2))
-             (if (and (< index length)
-                      (memq (aref pattern index)
-                            '(?! ?^)))
-                 (setq index (1+ index)
-                       result `(,@result "[^"))
-               (setq result `(,@result "[")))
-             (setq in-brackets t))))
+                 has-comma nil)
+           (while (and (or (and (< pos length)
+                                (not (= (aref pattern pos)
+                                        ?})))
+                           is-escaped)
+                       (not has-comma))
+             (if (and (eq (aref pattern pos)
+                          ?,)
+                      (not is-escaped))
+                 (setq has-comma t)
+               (setq is-escaped (and (eq (aref pattern pos)
+                                         ?\\)
+                                     (not is-escaped))
+                     pos (1+ pos))))
+           (if (and (not has-comma)
+                    (< pos length))
+               (let ((pattern-sub (substring pattern index pos)))
+                 (setq num-range (string-match editorconfig-fnmatch--numeric-range-regexp
+                                               pattern-sub))
+                 (if num-range
+                     (setq numeric-groups `(,@numeric-groups ,(mapcar 'string-to-number
+                                                                      (list (match-string 1
+                                                                                          pattern-sub)
+                                                                            (match-string 2
+                                                                                          pattern-sub))))
+                           result `(,@result "\\([+-]?[0-9]+\\)"))
+                   (let ((inner (editorconfig-fnmatch--do-translate pattern-sub t)))
+                     (setq result `(,@result ,(format "{%s}"
+                                                      (car inner)))
+                           numeric-groups `(,@numeric-groups ,@(nth 1 inner)))))
+                 (setq index (1+ pos)))
+             (if matching-braces
+                 (setq result `(,@result "\\(?:")
+                       brace-level (1+ brace-level))
+               (setq result `(,@result "{")))))
 
-        (?-
-         (if in-brackets
-             (setq result `(,@result "-"))
-           (setq result `(,@result "\\-"))))
-
-        (?\]
-         (setq result `(,@result "]")
-               in-brackets nil))
-
-        (?{
-         (setq pos index
-               has-comma nil)
-         (while (and (or (and (< pos length)
-                              (not (= (aref pattern pos)
-                                      ?})))
-                         is-escaped)
-                     (not has-comma))
-           (if (and (eq (aref pattern pos)
-                        ?,)
+          (?,
+           (if (and (> brace-level 0)
                     (not is-escaped))
-               (setq has-comma t)
-             (setq is-escaped (and (eq (aref pattern pos)
-                                       ?\\)
-                                   (not is-escaped))
-                   pos (1+ pos))))
-         (if (and (not has-comma)
-                  (< pos length))
-             (let ((pattern-sub (substring pattern index pos)))
-               (setq num-range (string-match editorconfig-fnmatch--numeric-range-regexp
-                                             pattern-sub))
-               (if num-range
-                   (setq numeric-groups `(,@numeric-groups ,(mapcar 'string-to-number
-                                                                    (list (match-string 1
-                                                                                        pattern-sub)
-                                                                          (match-string 2
-                                                                                        pattern-sub))))
-                         result `(,@result "\\([+-]?[0-9]+\\)"))
-                 (let ((inner (editorconfig-fnmatch--do-translate pattern-sub t)))
-                   (setq result `(,@result ,(format "{%s}"
-                                                    (car inner)))
-                         numeric-groups `(,@numeric-groups ,@(nth 1 inner)))))
-               (setq index (1+ pos)))
-           (if matching-braces
-               (setq result `(,@result "\\(?:")
-                     brace-level (1+ brace-level))
-             (setq result `(,@result "{")))))
+               (setq result `(,@result "\\|"))
+             (setq result `(,@result "\\,"))))
 
-        (?,
-         (if (and (> brace-level 0)
-                  (not is-escaped))
-             (setq result `(,@result "\\|"))
-           (setq result `(,@result "\\,"))))
+          (?}
+           (if (and (> brace-level 0)
+                    (not is-escaped))
+               (setq result `(,@result "\\)")
+                     brace-level (- brace-level 1))
+             (setq result `(,@result "}"))))
 
-        (?}
-         (if (and (> brace-level 0)
-                  (not is-escaped))
-             (setq result `(,@result "\\)")
-                   brace-level (- brace-level 1))
-           (setq result `(,@result "}"))))
+          (?/
+           (if (and (<= (+ index 3)
+                        (length pattern))
+                    (string= (substring pattern index (+ index 3))
+                             "**/"))
+               (setq result `(,@result "\\(?:/\\|/.*/\\)")
+                     index (+ index 3))
+             (setq result `(,@result "/"))))
 
-        (?/
-         (if (and (<= (+ index 3)
-                      (length pattern))
-                  (string= (substring pattern index (+ index 3))
-                           "**/"))
-             (setq result `(,@result "\\(?:/\\|/.*/\\)")
-                   index (+ index 3))
-           (setq result `(,@result "/"))))
+          (t
+           (unless (= current-char
+                      ?\\)
+             (setq result `(,@result ,(regexp-quote (char-to-string current-char)))))))
 
-        (t
-         (unless (= current-char
-                    ?\\)
-           (setq result `(,@result ,(regexp-quote (char-to-string current-char)))))))
-
-      (if (= current-char ?\\)
-          (progn (when is-escaped
-                   (setq result `(,@result "\\\\")))
-                 (setq is-escaped (not is-escaped)))
-        (setq is-escaped nil)))
+        (if (= current-char ?\\)
+            (progn (when is-escaped
+                     (setq result `(,@result "\\\\")))
+                   (setq is-escaped (not is-escaped)))
+          (setq is-escaped nil))))
     (unless nested
       (setq result `("^" ,@result "\\'")))
     (list (mapconcat 'identity
