@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8slashes+el [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/editorconfig-fnmatch-el
-;; Version: 0.1.2
+;; Version: 0.1.3
 ;; Keywords: utility shell fnmatch glob wildcard
 ;; Package-Requires: ((cl-lib "0.5"))
 
