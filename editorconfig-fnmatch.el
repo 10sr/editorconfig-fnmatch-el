@@ -163,11 +163,12 @@ translation is found for PATTERN."
     (while (< index length)
       ;; TODO: More good pattern for 'normal' strings
       (if (and (not is-escaped)
-               (string-match "[a-zA-Z0-9]+"
+               (string-match "[^]-\\*?[{},/\\]+"
+               ;(string-match "[^]-\\*?[{},/\\]+" "*ab")
                              pattern
                              index)
                (eq index (match-beginning 0)))
-          (setq result `(,@result ,(match-string 0 pattern))
+          (setq result `(,@result ,(regexp-quote (match-string 0 pattern)))
                 index (match-end 0)
                 is-escaped nil)
 
