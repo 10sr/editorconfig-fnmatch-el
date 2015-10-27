@@ -162,7 +162,8 @@ translation is found for PATTERN."
 
     (while (< index length)
       (if (and (not is-escaped)
-               (string-match "[^]-\\*?[{},/\\]+"
+               (string-match "[^]\\*?[{},/\\-]+"
+               ;;(string-match "[^]\\*?[{},/\\-]+" "?.a")
                              pattern
                              index)
                (eq index (match-beginning 0)))
