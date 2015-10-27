@@ -161,10 +161,8 @@ translation is found for PATTERN."
         num-range)
 
     (while (< index length)
-      ;; TODO: More good pattern for 'normal' strings
       (if (and (not is-escaped)
                (string-match "[^]-\\*?[{},/\\]+"
-               ;(string-match "[^]-\\*?[{},/\\]+" "*ab")
                              pattern
                              index)
                (eq index (match-beginning 0)))
