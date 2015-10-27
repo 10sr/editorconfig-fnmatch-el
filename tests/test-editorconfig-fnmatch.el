@@ -25,10 +25,13 @@
            ("ab[e/]cd.i" "ab[e/]cd.i")
            ("a.js" "[a-c].js")
            ("1.js" "[1-3].js")
+           ("a.js" "[a-c1-3].js")
+           ("1.js" "[a-c1-3].js")
 
            ("d.js" "[^abc].js")
            ("db.js" "[^abc]b.js")
            ("/dir/d.js" "/dir/[^abc].js")
+           ("d.js" "[^a-c].js")
 
            ("a.js" "a.{py,js}")
            ("a.py" "a.{py,js}")
@@ -73,10 +76,17 @@
            ("d.js" "[abc].js")
            ("db.js" "[abc]b.js")
            ("/dir/d.js" "/dir/[abc].js")
+           ("d.js" "[a-c].js")
+           ("4.js" "[1-3].js")
+           ("d.js" "[a-c1-3].js")
+           ("4.js" "[a-c1-3].js")
 
            ("a.js" "[^abc].js")
            ("ab.js" "[^abc]b.js")
            ("/dir/a.js" "/dir/[^abc].js")
+           ("a.js" "[^a-c].js")
+           ("a.js" "[^a-c1-3].js")
+           ("1.js" "[^a-c1-3].js")
 
            ("a.el" "a.{py,js}")
            ("a.el" "*.{py,js}")
