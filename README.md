@@ -9,8 +9,8 @@ editorconfig-fnmatch-el
 
 editorconfig-fnmatch.el provides a fnmatch implementation with a few
 extensions.
-The main usage of this library is glob pattern matching for EditorConfig, but it
-can also act solely.
+The main usage of this library is glob pattern matching for
+[EditorConfig](http://editorconfig.org), but it can also act solely.
 
 
 
